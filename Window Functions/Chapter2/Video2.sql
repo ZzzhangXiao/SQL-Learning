@@ -39,7 +39,7 @@ SELECT 	species,
 		admission_date,
 	-- window function: perform calculations on a set of rows
 		COUNT (*)  -- "COUNT(*) OVER ()" AS: window function
-		OVER () AS number_of_animals
+		OVER () AS number_of_animals -- "OVER()" == "FROM animals"
 FROM 	animals
 ORDER BY admission_date ASC;
 
@@ -56,7 +56,7 @@ SELECT 	species,
 			WHERE 	admission_date >= '2017-01-01'
 		) AS number_of_animals -- all rows same # in this col
 FROM 	animals
-ORDER BY admission_date ASC;\
+ORDER BY admission_date ASC;
 
 -- 5: 75 rows, 75 number_of_animals--
 
