@@ -27,26 +27,27 @@ ORDER BY 	species ASC,
 			admission_date ASC;
 
 -- PARTITION BY
-
+-- !!! alias a1 and a2 used to 
 SELECT 	a1.species, 
 		a1.name, 
 		a1.primary_color, 
 		a1.admission_date,
 		(	SELECT 	COUNT (*) 
 			FROM 	animals AS a2
-			WHERE 	a2.species = a1.species
+			WHERE 	a2.species = a1.species -- at current animal instance in a2, count the number of instance in a1 with the same species--
 		) AS number_of_species_animals
 FROM 	animals AS a1
 ORDER BY 	a1.species ASC, 
 			a1.admission_date ASC;
-		
+-- ==		
 SELECT 	species,
 		name,
 		primary_color,
 		admission_date,
 		COUNT (*) 
 		OVER (PARTITION BY species) AS number_of_species_animals
-FROM 	animals
+	-- divide the rows into partitions by the values in "species"--
+	FROM 	animals
 ORDER BY 	species ASC, 
 			admission_date ASC;
 
@@ -60,7 +61,7 @@ SELECT 	a.species,
 FROM 	animals AS a
 		INNER JOIN 
 		(	SELECT 	species,
-					COUNT(*) AS number_of_species_animals
+				COUNT(*) AS number_of_species_animals
 			FROM 	animals
 			GROUP BY species
 		) AS species_counts
