@@ -32,7 +32,8 @@ ORDER BY 	species ASC,
 -------------
 -- Framing --
 -------------
--- Count up-to-previous day number of animals of the same species
+-- The subquery calculates the count of animals for each species that were admitted before the admission date of the current animal 
+-- i.e. for each species, rank 0, 1, 2, ...
 SELECT 	a1.species, 
 		a1.name, 
 		a1.primary_color, 
@@ -47,6 +48,12 @@ FROM 	animals AS a1
 ORDER BY 	a1.species ASC,
 			a1.admission_date ASC;
 
+-- i.e. for each species, rank 1, 2, 3, 4...
+--ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW: include all rows before and including the current row--
+-- Logic: 
+-- 	at a current row, count over the window of < partition by species, order by admission date --
+-- 	the number of rows (within the partition) before the current rows
+-- 	== rank in the species partition --
 SELECT 	species, 
 		name, 
 		primary_color, 
@@ -86,20 +93,21 @@ SELECT 	species,
 				ORDER BY 		admission_date ASC
 				ROWS BETWEEN 	UNBOUNDED PRECEDING 
 								AND 
-								1 PRECEDING
+								1 PRECEDING -- up to one row before, so the count start from 0
 			 ) AS up_to_previous_day_species_animals
 FROM 	animals
 ORDER BY 	species ASC, 
 			admission_date ASC;
 
 -- Animals of the same species admitted on the same day
+-- return only the species (animals)admitted one day
 SELECT 	species, 
 		admission_date, 
 		COUNT (*)
 FROM 	animals
 GROUP BY 	species, 
 			admission_date 
-HAVING 	COUNT (*) > 1;
+HAVING 	COUNT (*) > 1; -- only display the count > 1
 
 -- Which animals are they?
 SELECT 	*
