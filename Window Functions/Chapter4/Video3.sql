@@ -7,7 +7,8 @@
 
 SELECT	*
 FROM	adoptions;
-
+-- Pay attention to Syntax: DATE_PART ('part', 'column') AS part,
+-- 	where DATE_PART is a SQL function
 SELECT	DATE_PART ('year', adoption_date) AS year,
 		DATE_PART ('month', adoption_date) AS month,
 		SUM (adoption_fee) AS month_total
@@ -30,11 +31,11 @@ GROUP BY 	DATE_PART ('year', adoption_date),
 			DATE_PART ('month', adoption_date)
 ORDER BY 	year ASC,
 			month ASC;
-
-SELECT 	DATE_PART ('year', adoption_date) AS year,
+-- incorrect nested cast 
+SELECT 	DATE_PART ('year', adoptrfgvtion_date) AS year,
 		DATE_PART ('month', adoption_date) AS month,
 		SUM (adoption_fee) AS month_total,
-		CAST	(100 *  SUM (adoption_fee) 
+		CAST	(100 *  SUM (adoption_fee) -- main difference with the later version
 						/	SUM ( SUM (adoption_fee)) 
 							OVER (PARTITION BY DATE_PART('year', adoption_date)) 
 			AS DECIMAL (5, 2)
@@ -44,19 +45,19 @@ GROUP BY 	DATE_PART('year', adoption_date),
 			DATE_PART('month', adoption_date)
 ORDER BY 	year ASC,
 			month ASC;
-
+-- improved using CTE
 WITH monthly_grouped_adoptions
 AS
 (
 SELECT 	DATE_PART ('year', adoption_date) AS year,
 		DATE_PART ('month', adoption_date) AS month,
-		SUM (adoption_fee) AS month_total
+		SUM (adoption_fee) AS month_total 
 FROM 	adoptions
 GROUP BY 	DATE_PART ('year', adoption_date), 
 			DATE_PART ('month', adoption_date)
 )
 SELECT 	*,
-		CAST 	(100 * month_total 
+		CAST 	(100 * month_total ---- different from previous version, CTE enables month_total in the main query
 				 / 	SUM (month_total) 
 					OVER (PARTITION BY year) 
 				AS DECIMAL (5, 2)
